@@ -27,6 +27,10 @@ void inorder(Node* root) {
     }
 }
 
+
+/* =========================
+   BST INSERTION
+   ========================= */
 void BST_Insert(Node*& root, Node* z) {
     Node* y = NULL;     // parent pointer
     Node* x = root;     // current pointer
