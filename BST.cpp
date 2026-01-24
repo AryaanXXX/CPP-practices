@@ -1,42 +1,33 @@
 #include <iostream>
 using namespace std;
 
-/* =========================
-   BST NODE DEFINITION
-   ========================= */
 struct Node {
-    int key;
-    Node* left;
-    Node* right;
-    Node* parent;
+    char key;
+    Node *left;
+    Node *right;
+    Node *parent;
 
-    Node(int val) {
+    Node(char val) {
         key = val;
-        left = right = parent = NULL;
+        left = right = parent = nullptr;
     }
 };
 
-/* =========================
-   INORDER TRAVERSAL
-   ========================= */
-void inorder(Node* root) {
-    if (root != NULL) {
+// Inorder Traversal
+void inorder(Node *root) {
+    if (root != nullptr) {
         inorder(root->left);
         cout << root->key << " ";
         inorder(root->right);
     }
 }
 
+// BST Insert
+void bst_insert(Node *&root, Node *z) {
+    Node *y = nullptr;   // parent
+    Node *x = root;      // current node
 
-/* =========================
-   BST INSERTION
-   ========================= */
-void BST_Insert(Node*& root, Node* z) {
-    Node* y = NULL;     // parent pointer
-    Node* x = root;     // current pointer
-
-    // Traverse down until x becomes NULL
-    while (x != NULL) {
+    while (x != nullptr) {
         y = x;
         if (z->key < x->key)
             x = x->left;
@@ -44,11 +35,9 @@ void BST_Insert(Node*& root, Node* z) {
             x = x->right;
     }
 
-    // y is parent of z
     z->parent = y;
 
-    // Tree was empty
-    if (y == NULL)
+    if (y == nullptr)
         root = z;
     else if (z->key < y->key)
         y->left = z;
@@ -56,11 +45,9 @@ void BST_Insert(Node*& root, Node* z) {
         y->right = z;
 }
 
-/* =========================
-   SEARCH FUNCTION
-   ========================= */
-Node* BST_Search(Node* root, int key) {
-    while (root != NULL && root->key != key) {
+// BST Search
+Node* bst_search(Node *root, char key) {
+    while (root != nullptr && root->key != key) {
         if (key < root->key)
             root = root->left;
         else
@@ -69,148 +56,112 @@ Node* BST_Search(Node* root, int key) {
     return root;
 }
 
-/* =========================
-   MINIMUM
-   ========================= */
-Node* Tree_Minimum(Node* x) {
-    while (x->left != NULL)
+// Minimum
+Node* tree_minimum(Node *x) {
+    while (x->left != nullptr)
         x = x->left;
     return x;
 }
 
-/* =========================
-   MAXIMUM
-   ========================= */
-Node* Tree_Maximum(Node* x) {
-    while (x->right != NULL)
+// Maximum
+Node* tree_maximum(Node *x) {
+    while (x->right != nullptr)
         x = x->right;
     return x;
 }
 
-/* =========================
-   SUCCESSOR
-   ========================= */
-Node* Tree_Successor(Node* x) {
-    if (x->right != NULL)
-        return Tree_Minimum(x->right);
+// Successor
+Node* tree_successor(Node *x) {
+    if (x->right != nullptr)
+        return tree_minimum(x->right);
 
-    Node* y = x->parent;
-    while (y != NULL && x == y->right) {
+    Node *y = x->parent;
+    while (y != nullptr && x == y->right) {
         x = y;
         y = y->parent;
     }
     return y;
 }
 
-/* =========================
-   PREDECESSOR
-   ========================= */
-Node* Tree_Predecessor(Node* x) {
-    if (x->left != NULL)
-        return Tree_Maximum(x->left);
+// Predecessor
+Node* tree_predecessor(Node *x) {
+    if (x->left != nullptr)
+        return tree_maximum(x->left);
 
-    Node* y = x->parent;
-    while (y != NULL && x == y->left) {
+    Node *y = x->parent;
+    while (y != nullptr && x == y->left) {
         x = y;
         y = y->parent;
     }
     return y;
 }
 
-/* =========================
-   TRANSPLANT (CORE OF DELETE)
-   ========================= */
-void Transplant(Node*& root, Node* u, Node* v) {
-    // Case 1: u is root
-    if (u->parent == NULL)
+// Transplant
+void transplant(Node *&root, Node *u, Node *v) {
+    if (u->parent == nullptr)
         root = v;
-
-    // Case 2: u is left child
     else if (u == u->parent->left)
         u->parent->left = v;
-
-    // Case 3: u is right child
     else
         u->parent->right = v;
 
-    // Fix parent pointer of v
-    if (v != NULL)
+    if (v != nullptr)
         v->parent = u->parent;
 }
 
-/* =========================
-   BST DELETE
-   ========================= */
-void BST_Delete(Node*& root, Node* z) {
-
-    // Case 1: No left child
-    if (z->left == NULL)
-        Transplant(root, z, z->right);
-
-    // Case 2: No right child
-    else if (z->right == NULL)
-        Transplant(root, z, z->left);
-
-    // Case 3 & 4: Two children
+// BST Delete
+void bst_delete(Node *&root, Node *z) {
+    if (z->left == nullptr)
+        transplant(root, z, z->right);
+    else if (z->right == nullptr)
+        transplant(root, z, z->left);
     else {
-        Node* y = Tree_Minimum(z->right);
+        Node *y = tree_minimum(z->right);
 
-        // Case 3: successor is not immediate child
         if (y->parent != z) {
-            Transplant(root, y, y->right);
+            transplant(root, y, y->right);
             y->right = z->right;
             y->right->parent = y;
         }
 
-        // Case 4: successor is immediate child
-        Transplant(root, z, y);
+        transplant(root, z, y);
         y->left = z->left;
         y->left->parent = y;
     }
-
-    delete z;
 }
 
-/* =========================
-   MAIN FUNCTION
-   ========================= */
+// Main Function
 int main() {
-    Node* root = NULL;
+    Node *root = nullptr;
 
-    int values[] = {15, 3, 6, 18, 7, 17, 20, 2, 4, 13, 9, 12};
-
-    for (int v : values)
-        BST_Insert(root, new Node(v));
+    char values[] = {'F', 'B', 'G', 'A', 'D', 'I', 'C', 'E'};
+    for (char v : values) {
+        bst_insert(root, new Node(v));
+    }
 
     cout << "Inorder Traversal: ";
     inorder(root);
     cout << endl;
 
-    Node* z = BST_Search(root, 6);
-    if (z != NULL) {
-        BST_Delete(root, z);
-        cout << "After deleting 6: ";
+    Node *z = bst_search(root, 'D');
+    if (z != nullptr) {
+        bst_delete(root, z);
+        cout << "After deleting D: ";
         inorder(root);
         cout << endl;
     }
 
-    Node* x = BST_Search(root, 13);
-    if (x != NULL) {
-        Node* s = Tree_Successor(x);
-        Node* p = Tree_Predecessor(x);
+    Node *x = bst_search(root, 'E');
+    if (x != nullptr) {
+        Node *s = tree_successor(x);
+        Node *p = tree_predecessor(x);
 
-        if (s) cout << "Successor of 13: " << s->key << endl;
-        if (p) cout << "Predecessor of 13: " << p->key << endl;
+        if (s) cout << "Successor of E: " << s->key << endl;
+        if (p) cout << "Predecessor of E: " << p->key << endl;
     }
 
     return 0;
 }
-
-
-
-
-
-
 
 
 
